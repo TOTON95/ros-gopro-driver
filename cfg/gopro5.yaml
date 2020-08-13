@@ -1,0 +1,15 @@
+---
+ #GOPRO_5 settings
+ 
+ # Main functions
+ trigger: "http://10.5.5.9/gp/gpControl/command/shutter?p=1"
+ stop: "http://10.5.5.9/gp/gpControl/command/shutter?p=0"
+
+ # Main modes
+ video_mode: "http://10.5.5.9/gp/gpControl/command/mode?p=0"
+ photo_mode: "http://10.5.5.9/gp/gpControl/command/mode?p=1"
+ multi_shot_mode: "http://10.5.5.9/gp/gpControl/command/mode?p=2"
+
+ # Live Streaming 
+ wake_up_live: "http://10.5.5.9/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart"
+ live_url: "udp://10.5.5.9:8554"
