@@ -31,6 +31,19 @@ int main(int argc, char* argv[])
     //Init ROS
     ros::init(argc,argv,"gopro_video");
 
+    //Nodehandle that is in charge of every operation and the image transport that acquires and publishes the images back to ROS
+	ros::NodeHandle n;
+	image_transport::ImageTransport it(n);
+
+    //Image publisher
+    image_transport::Publisher img_pub;
+
+	//Pointer to the ROS image
+	sensor_msgs::ImagePtr img_out;
+
+    //Advertise img topic
+    img_pub = it.advertise("gopro_out",100);
+
     //FFmpeg containers
     SwsContext *img_convert_ctx;
     AVFormatContext* format_ctx = avformat_alloc_context();
@@ -73,7 +86,7 @@ int main(int argc, char* argv[])
     AVStream* stream = NULL;
 
     //Frame counter (DEL)
-    int cnt = 0;
+    unsigned long cnt = 0;
 
     //Start reading packets from stream and write them to file
     av_read_play(format_ctx);
@@ -102,7 +115,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
 
     //Get the frame context to convert
-    img_convert_ctx = sws_getContext(codec_ctx->width, codec_ctx->height, codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height, AV_PIX_FMT_RGB24, SWS_BICUBIC, NULL, NULL, NULL);
+    img_convert_ctx = sws_getContext(codec_ctx->width, codec_ctx->height, codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height, AV_PIX_FMT_BGR24, SWS_BICUBIC, NULL, NULL, NULL);
 
     //Get the original frame size in bytes
     int size = avpicture_get_size(AV_PIX_FMT_YUV420P, codec_ctx->width, codec_ctx->height);
@@ -117,56 +130,77 @@ int main(int argc, char* argv[])
     AVFrame* picture_rgb = av_frame_alloc();
 
     //Get the output frame size
-    int size2 = avpicture_get_size(AV_PIX_FMT_RGB24, codec_ctx->width, codec_ctx->height);
+    int size2 = avpicture_get_size(AV_PIX_FMT_BGR24, codec_ctx->width, codec_ctx->height);
 
     //Create the output frame buffer
     uint8_t* picture_buffer_2 = (uint8_t*)(av_malloc(size2));
 
     //Fill out the containers
     avpicture_fill((AVPicture*) picture, picture_buffer, AV_PIX_FMT_YUV420P, codec_ctx->width, codec_ctx->height);
-    avpicture_fill((AVPicture*) picture_rgb, picture_buffer_2, AV_PIX_FMT_RGB24, codec_ctx->width, codec_ctx->height);
+    avpicture_fill((AVPicture*) picture_rgb, picture_buffer_2, AV_PIX_FMT_BGR24, codec_ctx->width, codec_ctx->height);
 
     //Start reading the frames
-    while(av_read_frame(format_ctx, &packet) >= 0)
+    while(ros::ok())
     {
-        std::cout<<"[1] Frame: "<<cnt<<std::endl;
-
-        //Identify if this is a video stream
-        if(packet.stream_index == video_stream_index)
+        if(av_read_frame(format_ctx, &packet) >= 0)
         {
-            std::cout<<"[2] Is Video"<<std::endl;
-            
-            //Create stream in file
-            if(stream == NULL)
+            std::cout<<"[1] Frame: "<<cnt<<std::endl;
+
+            //Identify if this is a video stream
+            if(packet.stream_index == video_stream_index)
             {
-                std::cout<<"[3] Create stream"<<std::endl;
+                std::cout<<"[2] Is Video"<<std::endl;
 
-                //Set the stream
-                stream = avformat_new_stream(output_ctx, format_ctx->streams[video_stream_index]->codec->codec);
-                //Copy the context into the stream
-                avcodec_copy_context(stream->codec, format_ctx->streams[video_stream_index]->codec);
+                //Create stream in file
+                if(stream == NULL)
+                {
+                    std::cout<<"[3] Create stream"<<std::endl;
 
-                //Set the sample aspect ratio
-                stream->sample_aspect_ratio = format_ctx->streams[video_stream_index]->codec->sample_aspect_ratio;
-            }
+                    //Set the stream
+                    stream = avformat_new_stream(output_ctx, format_ctx->streams[video_stream_index]->codec->codec);
+                    //Copy the context into the stream
+                    avcodec_copy_context(stream->codec, format_ctx->streams[video_stream_index]->codec);
 
-            //Result of decoding
-            int check = 0;
+                    //Set the sample aspect ratio
+                    stream->sample_aspect_ratio = format_ctx->streams[video_stream_index]->codec->sample_aspect_ratio;
+                }
 
-            //Set packet stream
-            packet.stream_index = stream->id;
-            
-            std::cout<<"[4] decoding" << std::endl;
+                //Result of decoding
+                int check = 0;
 
-            //Decode video
-            int result = avcodec_decode_video2(codec_ctx, picture, &check, &packet);
-            std::cout<< "Bytes decoded " << result << " check " << check << std::endl; 
+                //Set packet stream
+                packet.stream_index = stream->id;
 
-            //Let some frames to pass (0 to proceed immediately)
-            /*if(cnt)
-            {
+                std::cout<<"[4] decoding" << std::endl;
 
-                std::cout<<"Saving frame..."<<std::endl;
+                //Decode video
+                int result = avcodec_decode_video2(codec_ctx, picture, &check, &packet);
+                std::cout<< "Bytes decoded " << result << " check " << check << std::endl; 
+
+                //Scale the image
+                sws_scale(img_convert_ctx, picture->data, picture->linesize, 0, codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
+
+                //Create image to send to ROS
+                cv::Mat temp_img = cv::Mat(codec_ctx->height, codec_ctx->width, CV_8UC3, picture_rgb->data[0], picture_rgb->linesize[0]);
+
+                //cv::imshow("ASDD", temp_img);
+                //cv::waitKey(3);
+
+                std_msgs::Header header;
+                header.seq = cnt;
+                header.stamp = ros::Time::now();
+                cv_bridge::CvImage _img;
+                _img.encoding = "bgr8";
+                _img.image = temp_img.clone();
+                img_out = _img.toImageMsg();
+                img_pub.publish(img_out);
+
+
+                //Let some frames to pass (0 to proceed immediately)
+                /*if(cnt)
+                  {
+
+                  std::cout<<"Saving frame..."<<std::endl;
 
                 //Scale image
                 sws_scale(img_convert_ctx, picture->data, picture->linesize, 0, codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
@@ -175,7 +209,7 @@ int main(int argc, char* argv[])
                 std::stringstream file_name;
                 file_name << "test" << cnt << ".ppm";
                 //file_name << "test.ppm";
-                
+
                 //Create and open the file
                 output_file.open(file_name.str().c_str());
 
@@ -185,25 +219,34 @@ int main(int argc, char* argv[])
                 //Fill out the file with data
                 for (int y=0; y<codec_ctx->height;y++)
                 {
-                    for(int x=0; x<codec_ctx->width * 3; x++)
-                    {
-                        output_file<<(int)(picture_rgb->data[0]+y*picture_rgb->linesize[0])[x] << " ";
-                    }
+                for(int x=0; x<codec_ctx->width * 3; x++)
+                {
+                output_file<<(int)(picture_rgb->data[0]+y*picture_rgb->linesize[0])[x] << " ";
+                }
                 }
 
                 //Close file
                 output_file.close();
-            }*/
-            
-            //Update counter
-            cnt++;
+                }*/
+
+                //Update counter
+                cnt++;
+            }
+
+            //Free the packet
+            av_free_packet(&packet);
+
+            //Re-init the packet for the upcoming frame
+            av_init_packet(&packet);
+        }
+        
+        else
+        {
+            ROS_WARN("AWAITING FOR A VALID FRAME...\n\n");
         }
 
-        //Free the packet
-        av_free_packet(&packet);
-
-        //Re-init the packet for the upcoming frame
-        av_init_packet(&packet);
+        //Spin
+        ros::spinOnce();
     }
 
     //Release resources

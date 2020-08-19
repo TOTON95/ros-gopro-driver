@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   roscpp
+  rospy
   sensor_msgs
   std_msgs
 )
@@ -26,6 +27,8 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
     libswscale
     libavutil
 )
+
+find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -161,7 +164,7 @@ add_executable(${PROJECT_NAME}_node src/ros-gopro-driver_node.cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(${PROJECT_NAME}_node
-   ${catkin_LIBRARIES} PkgConfig::LIBAV
+   ${catkin_LIBRARIES} PkgConfig::LIBAV ${OpenCV_LIBRARIES}
  )
 
 #############
