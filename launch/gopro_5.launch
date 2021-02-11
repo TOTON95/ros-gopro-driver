@@ -1,0 +1,8 @@
+<launch>
+    <arg name="namespace" default="gopro"/>
+    <group ns="gopro_5">
+        <rosparam command="load" file="$(find ros-gopro-driver)/cfg/gopro5.yaml"/>
+        <node pkg="ros-gopro-driver" type="ros-gopro.py" name="gopro_ctl" output="screen"/>
+        <!-- <node pkg="ros-gopro-driver" type="ros-gopro-driver_node" name="gopro_5" output="screen"/>-->
+    </group>
+</launch>

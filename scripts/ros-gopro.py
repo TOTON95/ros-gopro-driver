@@ -9,25 +9,42 @@ import rospy
 from std_msgs.msg import Empty, String, UInt8
 import requests
 
+# Request process
+def request_proc(URL):
+    PARAMS = {}
+    r = requests.get(url = URL, params = PARAMS)
 
-def cb_shutter(msg):
-    rospy.loginfo("Shutter activated\n")
+# Shutter callback (shoot photo, start recording)
+def cb_shutter(msg, URL):
+    rospy.loginfo("Shutter activated\n" )
+    request_proc(URL)
 
-def cb_stop(msg):
+# Stop signal callback (stop recording)
+def cb_stop(msg, URL):
     rospy.loginfo("Recording stopped\n")
+    request_proc(URL)
 
-def cb_live(msg):
+# Request live signal from GOPRO
+def cb_live(msg, URL):
     rospy.loginfo("Streaming...\n")
     rospy.loginfo("No streaming...\n")
 
-
+# Init function
 def init():
     rospy.init_node('gopro_node', anonymous=True)
     rospy.loginfo("Starting gopro node: " + rospy.get_name() + "...\n")
-    s_shutter = rospy.Subscriber('gp_shutter', Empty, cb_shutter)
-    s_stop = rospy.Subscriber('gp_stop', Empty, cb_stop)
-    s_live = rospy.Subscriber('gp_live', Empty, cb_live)
+    # Getting Parameters
+    shutter_url = rospy.get_param("trigger")
+    print(shutter_url)
+    stop_url = rospy.get_param("stop")
+    live_url = rospy.get_param("wake_up_live")
 
+    # Setting up subscribers
+    s_shutter = rospy.Subscriber('gp_shutter', Empty, cb_shutter, shutter_url)
+    s_stop = rospy.Subscriber('gp_stop', Empty, cb_stop, stop_url)
+    s_live = rospy.Subscriber('gp_live', Empty, cb_live, live_url)
+
+    # "Refresh" ros node
     rospy.spin()
 
 
