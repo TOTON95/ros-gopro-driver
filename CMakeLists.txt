@@ -16,6 +16,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
+# Add pthreads
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # Add ffmpeg dependencies
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
@@ -164,7 +168,7 @@ add_executable(${PROJECT_NAME}_node src/ros-gopro-driver_node.cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(${PROJECT_NAME}_node
-   ${catkin_LIBRARIES} PkgConfig::LIBAV ${OpenCV_LIBRARIES}
+     ${catkin_LIBRARIES} PkgConfig::LIBAV ${OpenCV_LIBRARIES} Threads::Threads
  )
 
 #############

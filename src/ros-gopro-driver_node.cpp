@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/video/video.hpp>
+#include <std_msgs/Empty.h>
 
 // Include c++ libraries
 #include <stdio.h>
@@ -13,7 +14,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <pthread.h>
 
+//Credits to:
 //https://stackoverflow.com/questions/10715170/receiving-rtsp-stream-using-ffmpeg-library
 
 //FFmpeg
@@ -25,15 +28,39 @@ extern "C"
 #include <libswscale/swscale.h>
 }
 
+//Live video request status
+bool live_request = false;
+
+//Live video request thread function
+//void *live_req_thread();
+
+//Live video request from ROS callback
+void cb_live(const std_msgs::Empty::ConstPtr& msg)
+{
+    live_request = true;
+}
 
 int main(int argc, char* argv[])
 {
     //Init ROS
-    ros::init(argc,argv,"gopro_video");
+    ros::init(argc,argv,"gopro_video", ros::init_options::AnonymousName);
 
     //Nodehandle that is in charge of every operation and the image transport that acquires and publishes the images back to ROS
 	ros::NodeHandle n;
 	image_transport::ImageTransport it(n);
+
+    //Live signal subscriber
+    ros::Subscriber live_sub = n.subscribe("gp_live", 15, cb_live);
+
+    //Rate for waiting time
+    ros::Rate waiting_rate(10);
+    while(n.ok())
+    {
+        ROS_INFO_STREAM("Waiting for a live stream request");
+        if(live_request) break;
+        waiting_rate.sleep();
+        ros::spinOnce();
+    }
 
     //Image publisher
     image_transport::Publisher img_pub;
@@ -56,7 +83,7 @@ int main(int argc, char* argv[])
     av_register_all();
     avformat_network_init();
 
-    //Open RTSP stream
+    //Open video stream
     if(avformat_open_input(&format_ctx, "udp://10.5.5.9:8554", NULL, NULL) !=0)
     {
         return EXIT_FAILURE;
@@ -144,17 +171,17 @@ int main(int argc, char* argv[])
     {
         if(av_read_frame(format_ctx, &packet) >= 0)
         {
-            std::cout<<"[1] Frame: "<<cnt<<std::endl;
+            ROS_DEBUG_STREAM("[1] Frame: "<<cnt<<std::endl);
 
             //Identify if this is a video stream
             if(packet.stream_index == video_stream_index)
             {
-                std::cout<<"[2] Is Video"<<std::endl;
+                ROS_DEBUG_STREAM("[2] Is Video"<<std::endl);
 
                 //Create stream in file
                 if(stream == NULL)
                 {
-                    std::cout<<"[3] Create stream"<<std::endl;
+                    ROS_DEBUG_STREAM("[3] Create stream"<<std::endl);
 
                     //Set the stream
                     stream = avformat_new_stream(output_ctx, format_ctx->streams[video_stream_index]->codec->codec);
@@ -171,11 +198,11 @@ int main(int argc, char* argv[])
                 //Set packet stream
                 packet.stream_index = stream->id;
 
-                std::cout<<"[4] decoding" << std::endl;
+                ROS_DEBUG_STREAM("[4] decoding" << std::endl);
 
                 //Decode video
                 int result = avcodec_decode_video2(codec_ctx, picture, &check, &packet);
-                std::cout<< "Bytes decoded " << result << " check " << check << std::endl; 
+                ROS_INFO_STREAM("Frame: " << cnt << "Bytes decoded " << result << " check " << check << std::endl); 
 
                 //Scale the image
                 sws_scale(img_convert_ctx, picture->data, picture->linesize, 0, codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
@@ -183,9 +210,8 @@ int main(int argc, char* argv[])
                 //Create image to send to ROS
                 cv::Mat temp_img = cv::Mat(codec_ctx->height, codec_ctx->width, CV_8UC3, picture_rgb->data[0], picture_rgb->linesize[0]);
 
-                //cv::imshow("ASDD", temp_img);
-                //cv::waitKey(3);
 
+                // Fill the ROS image with frame data
                 std_msgs::Header header;
                 header.seq = cnt;
                 header.stamp = ros::Time::now();
@@ -195,39 +221,6 @@ int main(int argc, char* argv[])
                 img_out = _img.toImageMsg();
                 img_pub.publish(img_out);
 
-
-                //Let some frames to pass (0 to proceed immediately)
-                /*if(cnt)
-                  {
-
-                  std::cout<<"Saving frame..."<<std::endl;
-
-                //Scale image
-                sws_scale(img_convert_ctx, picture->data, picture->linesize, 0, codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
-
-                //Create the files
-                std::stringstream file_name;
-                file_name << "test" << cnt << ".ppm";
-                //file_name << "test.ppm";
-
-                //Create and open the file
-                output_file.open(file_name.str().c_str());
-
-                //Insert PPM header
-                output_file << "P3 " <<codec_ctx->width<< " " << codec_ctx->height<< " 255\n";
-
-                //Fill out the file with data
-                for (int y=0; y<codec_ctx->height;y++)
-                {
-                for(int x=0; x<codec_ctx->width * 3; x++)
-                {
-                output_file<<(int)(picture_rgb->data[0]+y*picture_rgb->linesize[0])[x] << " ";
-                }
-                }
-
-                //Close file
-                output_file.close();
-                }*/
 
                 //Update counter
                 cnt++;
