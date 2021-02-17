@@ -15,6 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include <pthread.h>
+#include <string>
 
 //Credits to:
 //https://stackoverflow.com/questions/10715170/receiving-rtsp-stream-using-ffmpeg-library
@@ -71,6 +72,10 @@ int main(int argc, char* argv[])
     //Advertise img topic
     img_pub = it.advertise("gopro_out",100);
 
+    //Get GOPRO livestream url
+    std::string gopro_url;
+    n.param<std::string>("live_url", gopro_url, "udp://10.5.5.9:8554");
+
     //FFmpeg containers
     SwsContext *img_convert_ctx;
     AVFormatContext* format_ctx = avformat_alloc_context();
@@ -84,7 +89,7 @@ int main(int argc, char* argv[])
     avformat_network_init();
 
     //Open video stream
-    if(avformat_open_input(&format_ctx, "udp://10.5.5.9:8554", NULL, NULL) !=0)
+    if(avformat_open_input(&format_ctx, gopro_url.c_str(), NULL, NULL) !=0)
     {
         return EXIT_FAILURE;
     }
@@ -202,7 +207,7 @@ int main(int argc, char* argv[])
 
                 //Decode video
                 int result = avcodec_decode_video2(codec_ctx, picture, &check, &packet);
-                ROS_INFO_STREAM("Frame: " << cnt << "Bytes decoded " << result << " check " << check << std::endl); 
+                ROS_INFO_STREAM("Frame: " << cnt << " Bytes decoded " << result << " check " << check << std::endl); 
 
                 //Scale the image
                 sws_scale(img_convert_ctx, picture->data, picture->linesize, 0, codec_ctx->height, picture_rgb->data, picture_rgb->linesize);
