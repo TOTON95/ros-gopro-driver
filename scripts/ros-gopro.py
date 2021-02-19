@@ -26,6 +26,11 @@ def cb_stop(msg, URL):
     rospy.loginfo("Recording stopped\n")
     request_proc(URL)
 
+# Video mode signal callback (change to video record)
+def cb_mode(msg,URLS):
+    rospy.loginfo("Accessing: " + str(URLS[msg.data]))
+    request_proc(URLS[msg.data])
+
 # Live-streaming monitor
 class GOPRO_LIVE_MON(object):
 
@@ -54,14 +59,22 @@ class GOPRO_LIVE_MON(object):
 def init():
     rospy.init_node('gopro_node', anonymous=True)
     rospy.loginfo("Starting gopro node: " + rospy.get_name() + "...\n")
+
     # Getting Parameters
     shutter_url = rospy.get_param("trigger")
     stop_url = rospy.get_param("stop")
     live_url = rospy.get_param("wake_up_live")
+    video_mode_url = rospy.get_param("video_mode")
+    photo_mode_url = rospy.get_param("photo_mode")
+    multi_shot_mode_url = rospy.get_param("multi_shot_mode")
+
+    # Packaging urls
+    mode_urls = [video_mode_url,photo_mode_url,multi_shot_mode_url]
 
     # Setting up subscribers
     s_shutter = rospy.Subscriber('gp_shutter', Empty, cb_shutter, shutter_url)
     s_stop = rospy.Subscriber('gp_stop', Empty, cb_stop, stop_url)
+    s_mode = rospy.Subscriber('gp_mode', UInt8, cb_mode, mode_urls)
 
     # Create thread for live stream
     gopro_mon =  GOPRO_LIVE_MON(live_url)
