@@ -1,5 +1,7 @@
 # ros-gopro-driver
 
+![ros-gopro-driver Artwork](https://toton95.github.io/assets/img/posts/ros_gopro_driver_6.jpg)
+
 This is an interface between ROS and a GOPRO camera (GOPRO 4 and above), this driver transports images from the camera using WiFi towards the ROS environment, publishing it as a ROS image topic, leaving it usable for any further process. 
 
 ## Quickstart (Linux)
