@@ -13,3 +13,133 @@
  # Live Streaming 
  wake_up_live: "http://10.5.5.9/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart"
  live_url: "udp://10.5.5.9:8554"
+
+ # Tag moments
+ tag_moment: "http://10.5.5.9/gp/gpControl/command/storage/tag_moment"
+
+ # General Settings
+ general_settings:
+   orientation:
+    up:   "http://10.5.5.9/gp/gpControl/setting/52/1"
+    down: "http://10.5.5.9/gp/gpControl/setting/52/2"
+    gyro: "http://10.5.5.9/gp/gpControl/setting/52/0"
+   voice_control:
+    vc_on:  "http://10.5.5.9/gp/gpControl/setting/86/1"
+    vc_off: "http://10.5.5.9/gp/gpControl/setting/86/0"
+   lcd:
+    timeout:
+      never: "http://10.5.5.9/gp/gpControl/setting/51/0"
+      1_min: "http://10.5.5.9/gp/gpControl/setting/51/1"
+      2_min: "http://10.5.5.9/gp/gpControl/setting/51/2"
+      3_min: "http://10.5.5.9/gp/gpControl/setting/51/3"
+   auto-off:
+    never: "http://10.5.5.9/gp/gpControl/setting/59/0"
+    1m:    "http://10.5.5.9/gp/gpControl/setting/59/1"
+    2m:    "http://10.5.5.9/gp/gpControl/setting/59/2"
+    3m:    "http://10.5.5.9/gp/gpControl/setting/59/3"
+    5m:    "http://10.5.5.9/gp/gpControl/setting/59/4"
+  
+
+
+ # Video Settings
+ video_settings:
+  resolution:
+    4k: "http://10.5.5.9/gp/gpControl/setting/2/1"
+    2_7k: "http://10.5.5.9/gp/gpControl/setting/2/4"
+    2_7k_4_3: "http://10.5.5.9/gp/gpControl/setting/2/6"
+    1440p: "http://10.5.5.9/gp/gpControl/setting/2/7"
+    1080p: "http://10.5.5.9/gp/gpControl/setting/2/9"
+    960p: "http://10.5.5.9/gp/gpControl/setting/2/10"
+    720p: "http://10.5.5.9/gp/gpControl/setting/2/12"
+    WVGA: "http://10.5.5.9/gp/gpControl/setting/2/17"
+  frame_rate:
+    240fps: "http://10.5.5.9/gp/gpControl/setting/3/0"
+    120fps: "http://10.5.5.9/gp/gpControl/setting/3/1"
+    100fps: "http://10.5.5.9/gp/gpControl/setting/3/2"
+    90fps:	"http://10.5.5.9/gp/gpControl/setting/3/3"
+    80fps:	"http://10.5.5.9/gp/gpControl/setting/3/4"
+    60fps:	"http://10.5.5.9/gp/gpControl/setting/3/5"
+    50fps:	"http://10.5.5.9/gp/gpControl/setting/3/6"
+    48fps:	"http://10.5.5.9/gp/gpControl/setting/3/7"
+    30fps:	"http://10.5.5.9/gp/gpControl/setting/3/8"
+    25fps:	"http://10.5.5.9/gp/gpControl/setting/3/9"
+  fov:
+    Wide:      "http://10.5.5.9/gp/gpControl/setting/4/0"
+    Medium:    "http://10.5.5.9/gp/gpControl/setting/4/1"
+    Narrow:    "http://10.5.5.9/gp/gpControl/setting/4/2"
+    SuperView: "http://10.5.5.9/gp/gpControl/4/3"
+    Linear:    "http://10.5.5.9/gp/gpControl/setting/4/4"
+  low_light:
+    l_on:       "http://10.5.5.9/gp/gpControl/setting/8/1"
+    l_off:      "http://10.5.5.9/gp/gpControl/setting/8/0"
+  video_stabilization:
+    s_on:  "http://10.5.5.9/gp/gpControl/setting/78/1"
+    s_off: "http://10.5.5.9/gp/gpControl/setting/78/0"
+  white_balance:
+    Auto:   "http://10.5.5.9/gp/gpControl/setting/11/0"
+    3000k:  "http://10.5.5.9/gp/gpControl/setting/11/1"
+    4000k:  "http://10.5.5.9/gp/gpControl/setting/11/5"
+    4800k:  "http://10.5.5.9/gp/gpControl/setting/11/6"
+    5500k:  "http://10.5.5.9/gp/gpControl/setting/11/2"
+    6000k:  "http://10.5.5.9/gp/gpControl/setting/11/7"
+    6500k:  "http://10.5.5.9/gp/gpControl/setting/11/3"
+    Native: "http://10.5.5.9/gp/gpControl/setting/11/4"
+  color:
+    gopro:  "http://10.5.5.9/gp/gpControl/setting/12/0"
+    flat:   "http://10.5.5.9/gp/gpControl/setting/12/1"
+  iso:
+    limit:
+      l_6400: "http://10.5.5.9/gp/gpControl/setting/13/0"
+      l_1600: "http://10.5.5.9/gp/gpControl/setting/13/1"
+      l_400:  "http://10.5.5.9/gp/gpControl/setting/13/2"
+      l_3200: "http://10.5.5.9/gp/gpControl/setting/13/3"
+      l_800:  "http://10.5.5.9/gp/gpControl/setting/13/4"
+      l_200:  "http://10.5.5.9/gp/gpControl/setting/13/7"
+      l_100:  "http://10.5.5.9/gp/gpControl/setting/13/8"
+    mode:
+      max:  "http://10.5.5.9/gp/gpControl/setting/74/0"
+      lock: "http://10.5.5.9/gp/gpControl/setting/74/1"
+  sharpness:
+      High: "http://10.5.5.9/gp/gpControl/setting/14/0"
+      Med:  "http://10.5.5.9/gp/gpControl/setting/14/1"
+      Low:  "http://10.5.5.9/gp/gpControl/setting/14/2"
+
+# Photo Settings
+photo_settings:
+  resolution: 
+    12MP_Wide:   "http://10.5.5.9/gp/gpControl/setting/17/0"
+    12MP_Linear: "http://10.5.5.9/gp/gpControl/setting/17/10"
+    12MP_Medium: "http://10.5.5.9/gp/gpControl/setting/17/8"
+    12MP_Narrow: "http://10.5.5.9/gp/gpControl/setting/17/9"
+  raw:
+    r_on:  "http://10.5.5.9/gp/gpControl/setting/82/1"
+    r_off: "http://10.5.5.9/gp/gpControl/setting/82/0"
+  white_balance:
+    Auto:   "http://10.5.5.9/gp/gpControl/setting/22/0"
+    3000k:  "http://10.5.5.9/gp/gpControl/setting/22/1"
+    4000k:  "http://10.5.5.9/gp/gpControl/setting/22/5"
+    4800k:  "http://10.5.5.9/gp/gpControl/setting/22/6"
+    5500k:  "http://10.5.5.9/gp/gpControl/setting/22/2"
+    6000k:  "http://10.5.5.9/gp/gpControl/setting/22/7"
+    6500k:  "http://10.5.5.9/gp/gpControl/setting/22/3"
+    Native: "http://10.5.5.9/gp/gpControl/setting/22/4"
+  color:
+    gopro: "http://10.5.5.9/gp/gpControl/setting/23/0"
+    flat:  "http://10.5.5.9/gp/gpControl/setting/23/1"
+  iso:
+    limit:
+      l_800: "http://10.5.5.9/gp/gpControl/setting/24/0"
+      l_400: "http://10.5.5.9/gp/gpControl/setting/24/1"
+      l_200: "http://10.5.5.9/gp/gpControl/setting/24/2"
+      l_100: "http://10.5.5.9/gp/gpControl/setting/24/3"
+    min:
+      m_800: "http://10.5.5.9/gp/gpControl/setting/75/0"
+      m_400: "http://10.5.5.9/gp/gpControl/setting/75/1"
+      m_200: "http://10.5.5.9/gp/gpControl/setting/75/2"
+      m_100: "http://10.5.5.9/gp/gpControl/setting/75/3"
+    sharpness:
+      High:   "http://10.5.5.9/gp/gpControl/setting/25/0"
+      Med:    "http://10.5.5.9/gp/gpControl/setting/25/1"
+      Low:    "http://10.5.5.9/gp/gpControl/setting/25/2"
+
+
