@@ -10,6 +10,7 @@ from std_msgs.msg import Empty, String, UInt8
 import requests
 import threading
 import time
+from datetime import datetime
 
 # Request process
 def request_proc(URL):
@@ -30,6 +31,16 @@ def cb_stop(msg, URL):
 def cb_mode(msg,URLS):
     rospy.loginfo("Accessing: " + str(URLS[msg.data]))
     request_proc(URLS[msg.data])
+
+# Get the date and time, convert it to gopro format
+def set_date_time():
+    now = datetime.now()
+    month = format(int(now.strftime("%m")),'02x') # october->10->0a
+    day = format(int(now.strftime("%d")),'02x')
+    hour = format(int(now.strftime("%H")),'02x')
+    minute = format(int(now.strftime("%M")),'02x')
+    seconds = format(int(now.strftime("%S")),'02x')
+    rospy.loginfo("Hex date: "+month+day+hour+minute+seconds)
 
 # Live-streaming monitor
 class GOPRO_LIVE_MON(object):
@@ -60,6 +71,13 @@ def init():
     rospy.init_node('gopro_node', anonymous=True)
     rospy.loginfo("Starting gopro node: " + rospy.get_name() + "...\n")
 
+    try:
+        param_list = rospy.get_param_names()
+        rospy.loginfo(param_list)
+    except:
+        rospy.loginfo("Couldn't get any parameter names")
+ 
+
     # Getting Parameters
     shutter_url = rospy.get_param("trigger")
     stop_url = rospy.get_param("stop")
@@ -75,6 +93,9 @@ def init():
     s_shutter = rospy.Subscriber('gp_shutter', Empty, cb_shutter, shutter_url)
     s_stop = rospy.Subscriber('gp_stop', Empty, cb_stop, stop_url)
     s_mode = rospy.Subscriber('gp_mode', UInt8, cb_mode, mode_urls)
+    
+    # Setup date and time
+    set_date_time()
 
     # Create thread for live stream
     gopro_mon =  GOPRO_LIVE_MON(live_url)

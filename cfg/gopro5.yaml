@@ -56,13 +56,13 @@
     240fps: "http://10.5.5.9/gp/gpControl/setting/3/0"
     120fps: "http://10.5.5.9/gp/gpControl/setting/3/1"
     100fps: "http://10.5.5.9/gp/gpControl/setting/3/2"
-    90fps:	"http://10.5.5.9/gp/gpControl/setting/3/3"
-    80fps:	"http://10.5.5.9/gp/gpControl/setting/3/4"
-    60fps:	"http://10.5.5.9/gp/gpControl/setting/3/5"
-    50fps:	"http://10.5.5.9/gp/gpControl/setting/3/6"
-    48fps:	"http://10.5.5.9/gp/gpControl/setting/3/7"
-    30fps:	"http://10.5.5.9/gp/gpControl/setting/3/8"
-    25fps:	"http://10.5.5.9/gp/gpControl/setting/3/9"
+    90fps: "http://10.5.5.9/gp/gpControl/setting/3/3"
+    80fps: "http://10.5.5.9/gp/gpControl/setting/3/4"
+    60fps: "http://10.5.5.9/gp/gpControl/setting/3/5"
+    50fps: "http://10.5.5.9/gp/gpControl/setting/3/6"
+    48fps: "http://10.5.5.9/gp/gpControl/setting/3/7"
+    30fps: "http://10.5.5.9/gp/gpControl/setting/3/8"
+    25fps: "http://10.5.5.9/gp/gpControl/setting/3/9"
   fov:
     Wide:      "http://10.5.5.9/gp/gpControl/setting/4/0"
     Medium:    "http://10.5.5.9/gp/gpControl/setting/4/1"
@@ -103,11 +103,11 @@
       High: "http://10.5.5.9/gp/gpControl/setting/14/0"
       Med:  "http://10.5.5.9/gp/gpControl/setting/14/1"
       Low:  "http://10.5.5.9/gp/gpControl/setting/14/2"
-
-# Photo Settings
-photo_settings:
+      
+ # Photo settings
+ photo_settings:
   resolution: 
-    12MP_Wide:   "http://10.5.5.9/gp/gpControl/setting/17/0"
+    12MP_Wide: "http://10.5.5.9/gp/gpControl/setting/17/0"
     12MP_Linear: "http://10.5.5.9/gp/gpControl/setting/17/10"
     12MP_Medium: "http://10.5.5.9/gp/gpControl/setting/17/8"
     12MP_Narrow: "http://10.5.5.9/gp/gpControl/setting/17/9"
@@ -141,5 +141,5 @@ photo_settings:
       High:   "http://10.5.5.9/gp/gpControl/setting/25/0"
       Med:    "http://10.5.5.9/gp/gpControl/setting/25/1"
       Low:    "http://10.5.5.9/gp/gpControl/setting/25/2"
-
+ 
 
