@@ -33,14 +33,21 @@ def cb_mode(msg,URLS):
     request_proc(URLS[msg.data])
 
 # Get the date and time, convert it to gopro format
-def set_date_time():
+def set_date_time(URL):
     now = datetime.now()
-    month = format(int(now.strftime("%m")),'02x') # october->10->0a
+    year = format(int(now.strftime("%y")),'02x')
+    month = format(int(now.strftime("%m")),'02x') 
     day = format(int(now.strftime("%d")),'02x')
     hour = format(int(now.strftime("%H")),'02x')
     minute = format(int(now.strftime("%M")),'02x')
     seconds = format(int(now.strftime("%S")),'02x')
-    rospy.loginfo("Hex date: "+month+day+hour+minute+seconds)
+    # rospy.loginfo("Hex date: "+year+" "+month+" "+day+" "+hour+" "+minute+" "+seconds)
+
+    # Build the string for date time 
+    date_time=str("%"+year+"%"+month+"%"+day+"%"+hour+"%"+minute+"%"+seconds)
+    rospy.loginfo("GoPro datetime: " + date_time)
+    set_date_time_url = URL+date_time
+    request_proc(set_date_time_url)
 
 # Live-streaming monitor
 class GOPRO_LIVE_MON(object):
@@ -85,6 +92,7 @@ def init():
     video_mode_url = rospy.get_param("video_mode")
     photo_mode_url = rospy.get_param("photo_mode")
     multi_shot_mode_url = rospy.get_param("multi_shot_mode")
+    date_time_url = rospy.get_param("datetime")
 
     # Packaging urls
     mode_urls = [video_mode_url,photo_mode_url,multi_shot_mode_url]
@@ -95,7 +103,7 @@ def init():
     s_mode = rospy.Subscriber('gp_mode', UInt8, cb_mode, mode_urls)
     
     # Setup date and time
-    set_date_time()
+    set_date_time(date_time_url)
 
     # Create thread for live stream
     gopro_mon =  GOPRO_LIVE_MON(live_url)

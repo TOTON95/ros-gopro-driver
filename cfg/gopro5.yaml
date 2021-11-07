@@ -14,6 +14,9 @@
  wake_up_live: "http://10.5.5.9/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart"
  live_url: "udp://10.5.5.9:8554"
 
+ # DateTime
+ datetime: "http://10.5.5.9/gp/gpControl/command/setup/date_time?p=" 
+
  # Tag moments
  tag_moment: "http://10.5.5.9/gp/gpControl/command/storage/tag_moment"
 
